@@ -1,5 +1,5 @@
 /*
-@author
+@Lucy Armitage
 
 This is an sql file to put your queries for SQL coursework. 
 You can write your comment in sqlite with -- or /* * /
@@ -19,16 +19,13 @@ DROP VIEW IF EXISTS vTopAlbumEachGenre;
 DROP VIEW IF EXISTS v20TopSellingArtists; 
 DROP VIEW IF EXISTS vTopCustomerEachGenre; 
 
-/*
-============================================================================
-Task 1: Complete the query for vNoCustomerEmployee.
-DO NOT REMOVE THE STATEMENT "CREATE VIEW vNoCustomerEmployee AS"
-============================================================================
-*/
 CREATE VIEW vNoCustomerEmployee AS
-SELECT EmployeeID, FirstName, LastName, Title
-FROM employees
-WHERE employee ();
+SELECT EmployeeId, FirstName, LastName, Title
+FROM employees 
+EXCEPT
+SELECT EmployeeId, FirstName, LastName, Title
+FROM employee
+LEFT JOIN customers ON  employee.EmployeeId = customers.SupportRepId;
 
 
 /*
@@ -37,8 +34,15 @@ Task 2: Complete the query for v10MostSoldMusicGenres
 DO NOT REMOVE THE STATEMENT "CREATE VIEW v10MostSoldMusicGenres AS"
 ============================================================================
 */
+
 CREATE VIEW v10MostSoldMusicGenres AS
---Remove this line and complete your query for Task 2 here
+SELECT genres.Name, SUM(invoice_items.Quantity) as Sales
+FROM genres 
+INNER JOIN tracks ON tracks.GenreId = genres.GenreId
+INNER JOIN invoice_items ON invoice_items.TrackId = tracks.TrackId
+GROUP BY genres.Name
+HAVING COUNT(*) > 1
+ORDER BY Sales DESC limit 10;
 
 
 /*
@@ -47,8 +51,19 @@ Task 3: Complete the query for vTopAlbumEachGenre
 DO NOT REMOVE THE STATEMENT "CREATE VIEW vTopAlbumEachGenre AS"
 ============================================================================
 */
+
 CREATE VIEW vTopAlbumEachGenre AS
---Remove this line and complete your query for Task 3 here
+SELECT genres.Name, albums.Title, artists.Name, SUM(invoice_items.Quantity) as Sales
+FROM genres
+INNER JOIN tracks ON tracks.GenreId = genres.GenreId
+INNER JOIN invoice_items ON invoice_items.TrackId = tracks.TrackId
+INNER JOIN albums ON albums.AlbumId = tracks.AlbumId
+INNER JOIN artists ON artists.ArtistId = albums.ArtistId
+WHERE genres.Name IN (SELECT DISTINCT genres.Name FROM genres)
+GROUP BY albums.AlbumId
+HAVING COUNT(*) > 1
+ORDER BY Sales DESC;
+
 
 
 /*
@@ -58,7 +73,7 @@ DO NOT REMOVE THE STATEMENT "CREATE VIEW v20TopSellingArtists AS"
 ============================================================================
 */
 
-CREATE VIEW v20TopSellingArtists AS
+--CREATE VIEW v20TopSellingArtists AS
 --Remove this line and complete your query for Task 4 here
 
 
@@ -68,6 +83,6 @@ Task 5: Complete the query for vTopCustomerEachGenre
 DO NOT REMOVE THE STATEMENT "CREATE VIEW vTopCustomerEachGenre AS" 
 ============================================================================
 */
-CREATE VIEW vTopCustomerEachGenre AS
+--CREATE VIEW vTopCustomerEachGenre AS
 --Remove this line and complete your query for Task 5 here
 
